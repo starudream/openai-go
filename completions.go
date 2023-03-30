@@ -5,8 +5,15 @@ import (
 )
 
 type CompletionsReq struct {
-	Model  string `json:"model"`
-	Prompt string `json:"prompt"`
+	Model            string  `json:"model"`
+	Prompt           string  `json:"prompt"`
+	Suffix           string  `json:"suffix,omitempty"`
+	MaxTokens        int     `json:"max_tokens,omitempty"`
+	Temperature      float64 `json:"temperature,omitempty"`
+	TopP             float64 `json:"top_p,omitempty"`
+	N                int     `json:"n,omitempty"`
+	PresencePenalty  float64 `json:"presence_penalty,omitempty"`
+	FrequencyPenalty float64 `json:"frequency_penalty,omitempty"`
 }
 
 type CompletionsResp struct {
@@ -19,23 +26,11 @@ type CompletionsResp struct {
 }
 
 type CompletionsChoice struct {
-	Text         string              `json:"text"`
+	Text         *string             `json:"text"`
 	Message      *CompletionsMessage `json:"message"`
+	Delta        *CompletionsMessage `json:"delta"`
 	Index        int                 `json:"index"`
 	FinishReason string              `json:"finish_reason"`
-}
-
-func (p *CompletionsResp) GetText() []string {
-	if p == nil || len(p.Choices) == 0 {
-		return nil
-	}
-	vs := make([]string, len(p.Choices))
-	for i, choice := range p.Choices {
-		if choice != nil {
-			vs[i] = choice.Text
-		}
-	}
-	return vs
 }
 
 func (p *CompletionsResp) GetMessage() []CompletionsMessage {
@@ -44,8 +39,12 @@ func (p *CompletionsResp) GetMessage() []CompletionsMessage {
 	}
 	vs := make([]CompletionsMessage, len(p.Choices))
 	for i, choice := range p.Choices {
-		if choice != nil && choice.Message != nil {
+		if choice.Text != nil {
+			vs[i] = NewCompletionsMessage("", *choice.Text)
+		} else if choice.Message != nil {
 			vs[i] = *choice.Message
+		} else if choice.Delta != nil {
+			vs[i] = *choice.Delta
 		}
 	}
 	return vs
@@ -60,6 +59,10 @@ type CompletionsUsage struct {
 type CompletionsMessage struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
+}
+
+func NewCompletionsMessage(role, content string) CompletionsMessage {
+	return CompletionsMessage{Role: role, Content: content}
 }
 
 func (c *Client) Completions(req CompletionsReq) (CompletionsResp, *http.Response, error) {

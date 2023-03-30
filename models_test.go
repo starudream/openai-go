@@ -13,7 +13,7 @@ func TestClient_ListModels(t *testing.T) {
 }
 
 func TestClient_RetrieveModel(t *testing.T) {
-	v, _, err := client.RetrieveModel("gpt-3.5-turbo")
+	v, _, err := client.RetrieveModel(modelGPT35)
 	if err != nil {
 		t.Fatal(err)
 	}

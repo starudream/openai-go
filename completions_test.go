@@ -14,8 +14,8 @@ func TestClient_Completions(t *testing.T) {
 	}
 	t.Logf("%#v", GetRatelimit(resp))
 
-	vs := v.GetText()
+	vs := v.GetMessage()
 	for i := 0; i < len(vs); i++ {
-		t.Logf("%02d: %#v", i+1, vs[i])
+		t.Logf("%02d: %#v", i+1, vs[i].Content)
 	}
 }

@@ -1,6 +1,8 @@
 package openai
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -77,11 +79,11 @@ func (c *Client) setBaseURL(urlStr string) error {
 	return nil
 }
 
-func (c *Client) Exec(method, path string, opt, res any) (*resty.Response, error) {
+func (c *Client) Pre(method, path string, opt any) (string, map[string]string, any, error) {
 	u := *c.baseURL
 	p, err := url.PathUnescape(path)
 	if err != nil {
-		return nil, err
+		return "", nil, nil, err
 	}
 
 	u.RawPath = c.baseURL.Path + path
@@ -96,9 +98,9 @@ func (c *Client) Exec(method, path string, opt, res any) (*resty.Response, error
 	switch method {
 	case http.MethodGet:
 		if opt != nil {
-			qvs, err := query.Values(opt)
-			if err != nil {
-				return nil, err
+			qvs, qe := query.Values(opt)
+			if qe != nil {
+				return "", nil, nil, qe
 			}
 			u.RawQuery = qvs.Encode()
 		}
@@ -109,17 +111,45 @@ func (c *Client) Exec(method, path string, opt, res any) (*resty.Response, error
 		}
 	}
 
-	resp, err := c.client.
-		NewRequest().
-		SetHeaders(headers).
-		SetBody(body).
-		SetResult(res).
-		Execute(method, u.String())
+	return u.String(), headers, body, nil
+}
+
+func (c *Client) Exec(method, path string, opt, res any) (*resty.Response, error) {
+	u, hds, body, err := c.Pre(method, path, opt)
 	if err != nil {
 		return nil, err
 	}
 
-	return resp, nil
+	return c.client.
+		NewRequest().
+		SetHeaders(hds).
+		SetBody(body).
+		SetResult(res).
+		Execute(method, u)
+}
+
+func (c *Client) rawPost(path string, opt any) (*http.Response, error) {
+	u, hds, body, err := c.Pre(http.MethodPost, path, opt)
+	if err != nil {
+		return nil, err
+	}
+
+	bs, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, u, bytes.NewReader(bs))
+	if err != nil {
+		return nil, err
+	}
+
+	hds["Accept"] = "text/event-stream"
+	for k, v := range hds {
+		req.Header.Set(k, v)
+	}
+
+	return c.client.GetClient().Do(req)
 }
 
 func newRestyClient() *resty.Client {

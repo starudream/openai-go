@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+const modelGPT35 = "gpt-3.5-turbo"
+
 var client *Client
 
 func TestMain(m *testing.M) {
