@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/starudream/openai-go/compare/v0.0.3...v0.0.4) (2023-03-31)
+
+
+### Features
+
+* add client options ([0204426](https://github.com/starudream/openai-go/commit/020442697de8c251cc0d431a48fb9e1e42855f5e))
+
 ## [0.0.3](https://github.com/starudream/openai-go/compare/v0.0.2...v0.0.3) (2023-03-31)
 
 
