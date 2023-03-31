@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/starudream/openai-go/compare/v0.0.2...v0.0.3) (2023-03-31)
+
+
+### Performance Improvements
+
+* perfect client debug ([868f250](https://github.com/starudream/openai-go/commit/868f25067f703a8ae5af52d5426d9a057e1ea9ab))
+
 ## [0.0.2](https://github.com/starudream/openai-go/compare/v0.0.1...v0.0.2) (2023-03-30)
 
 
