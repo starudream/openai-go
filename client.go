@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -153,10 +151,8 @@ func (c *Client) rawPost(path string, opt any) (*http.Response, error) {
 }
 
 func newRestyClient() *resty.Client {
-	debug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
-
 	c := resty.New()
-	c.SetDebug(debug)
+	c.SetDebug(Debug())
 	c.SetTimeout(5 * time.Minute)
 	c.SetDisableWarn(true)
 	c.SetLogger(&restyLogger{})
