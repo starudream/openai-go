@@ -118,12 +118,29 @@ func (c *Client) Exec(method, path string, opt, res any) (*resty.Response, error
 		return nil, err
 	}
 
-	return c.client.
+	resp, err := c.client.
 		NewRequest().
 		SetHeaders(hds).
 		SetBody(body).
 		SetResult(res).
+		SetError(&BaseResp{}).
 		Execute(method, u)
+	if err != nil {
+		return nil, err
+	}
+
+	if v, ok := resp.Error().(*BaseResp); ok {
+		return resp, fmt.Errorf("status: %d, type: %s, msg: %s", resp.StatusCode(), v.Error.Type, v.Error.Message)
+	}
+
+	return resp, nil
+}
+
+type BaseResp struct {
+	Error struct {
+		Message string `json:"message"`
+		Type    string `json:"type"`
+	} `json:"error"`
 }
 
 func (c *Client) rawPost(path string, opt any) (*http.Response, error) {
