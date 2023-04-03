@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/starudream/openai-go/compare/v0.0.4...v0.0.5) (2023-04-03)
+
+
+### Performance Improvements
+
+* perfect response error ([f4e425c](https://github.com/starudream/openai-go/commit/f4e425c0b11c8ae68a28de3de950ac8b8d8ca793))
+
 ## [0.0.4](https://github.com/starudream/openai-go/compare/v0.0.3...v0.0.4) (2023-03-31)
 
 
